@@ -398,6 +398,12 @@
 @media (max-width: 900px) {
   .materials {
     grid-template-columns: 1fr 1fr;
+    min-height: 0;
+  }
+
+  .materials img {
+    min-height: 12rem;
+    max-height: 14rem;
   }
 
   .split-grid,
@@ -420,11 +426,13 @@
     padding-block: 1rem;
   }
 
-  .materials {
-    grid-template-columns: 1fr;
+  .materials img {
+    min-height: 8.5rem;
+    max-height: 10rem;
   }
 
-  .materials img {
-    min-height: 14rem;
+  .materials figcaption {
+    left: 0.7rem;
+    bottom: 0.7rem;
   }
 }
