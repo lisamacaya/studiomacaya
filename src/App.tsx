@@ -135,7 +135,7 @@ function App() {
                 spaces made only to impress.
               </p>
               <p>
-                We look for authenticity — the kind a person can recognize as
+                We look for authenticity: the kind a person can recognize as
                 their own, and feel at ease inside.
               </p>
             </div>
@@ -149,7 +149,7 @@ function App() {
           </article>
           <article>
             <h3>Design</h3>
-            <p>An honest, intuitive process — from a single room to a complete remodel.</p>
+            <p>An honest, intuitive process, from a single room to a complete remodel.</p>
           </article>
           <article>
             <h3>Form</h3>
@@ -163,7 +163,7 @@ function App() {
           <div className="prose manifesto-copy">
             <p>
               From a single room to a complete project, Studio Macaya works with
-              clairvoyance — the gift of seeing what a space can become before
+              clairvoyance: the gift of seeing what a space can become before
               anyone else imagines it.
             </p>
             <p>
@@ -185,7 +185,7 @@ function App() {
           <div className="prose">
             <p>
               Macaya is an interior design studio that transforms the energy of
-              a space. Rooms should not only look right — they should feel
+              a space. Rooms should not only look right. They should feel
               right. Natural materials. Intentional decisions. A style clients
               recognize before they can name it.
             </p>
@@ -219,7 +219,7 @@ function App() {
       <footer className="site-footer">
         <p className="footer-mark" aria-hidden="true">M</p>
         <span className="footer-rule" aria-hidden="true" />
-        <p className="footer-line">matter — design — form</p>
+        <p className="footer-line">matter - design - form</p>
         <p className="footer-meta">© {new Date().getFullYear()} Studio Macaya</p>
       </footer>
     </>
