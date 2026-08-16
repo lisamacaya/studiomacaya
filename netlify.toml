@@ -1,0 +1,21 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+  VITE_APP_ENV = "dev"
+
+# Live branch — set as the production branch in Netlify (Site settings → Build & deploy)
+[context.production.environment]
+  VITE_APP_ENV = "live"
+
+# Dev branch — use for a dedicated dev Netlify site, or enable branch deploys
+[context."Dev".environment]
+  VITE_APP_ENV = "dev"
+
+# SPA client-side routing fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
