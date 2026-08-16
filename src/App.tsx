@@ -118,7 +118,7 @@ function App() {
         <section className="materials" aria-label="Materials">
           {materials.map((item) => (
             <figure key={item.label}>
-              <img src={item.src} alt={item.alt} />
+              <img src={item.src} alt={item.alt} loading="lazy" decoding="async" />
               <figcaption>{item.label}</figcaption>
             </figure>
           ))}
