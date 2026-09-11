@@ -1,8 +1,17 @@
+.page--dev {
+  --banner-h: 1.85rem;
+}
+
 .env-banner {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 20;
-  padding: 0.4rem 1rem;
+  height: var(--banner-h);
+  display: grid;
+  place-items: center;
+  padding: 0 1rem;
   text-align: center;
   font-size: 0.7rem;
   font-weight: 600;
@@ -12,22 +21,44 @@
   background: var(--stone);
 }
 
+/*
+ * Header
+ * Sits transparent over the hero. Once the page scrolls (a sentinel leaves
+ * the viewport) it gains a frosted cream background, a hairline, and tightens
+ * up. The wordmark is held back until the large hero logo has scrolled away,
+ * so the brand is only ever shown once at a time.
+ */
 .site-header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: var(--banner-h);
+  left: 0;
+  right: 0;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+  min-height: var(--header-h);
   padding: 1.15rem var(--pad);
-  background: color-mix(in srgb, var(--cream) 92%, transparent);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
+  color: var(--moss);
+  background: color-mix(in srgb, var(--cream) 0%, transparent);
+  border-bottom: 1px solid transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    padding var(--dur) var(--ease),
+    backdrop-filter var(--dur) var(--ease),
+    -webkit-backdrop-filter var(--dur) var(--ease);
 }
 
-.site-header--dev {
-  top: 1.85rem;
+.site-header.is-scrolled {
+  padding-block: 0.85rem;
+  background: color-mix(in srgb, var(--cream) 70%, transparent);
+  border-bottom-color: var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .site-header nav {
@@ -36,16 +67,54 @@
 }
 
 .site-header nav a {
+  position: relative;
+  padding-block: 0.3rem;
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   text-decoration: none;
   color: var(--moss);
+  transition: color var(--dur-fast) var(--ease);
 }
 
-.site-header nav a:hover {
+/* Underline that draws in from the left and leaves to the right. */
+.site-header nav a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.site-header nav a:hover,
+.site-header nav a:focus-visible {
   color: var(--clay);
+}
+
+.site-header nav a:hover::after,
+.site-header nav a:focus-visible::after,
+.site-header nav a[aria-current='true']::after {
+  transform: scaleX(1);
+  transform-origin: 0 50%;
+}
+
+.site-header nav a:focus-visible {
+  outline: none;
+}
+
+.scroll-sentinel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
 }
 
 .wordmark {
@@ -55,6 +124,21 @@
   gap: 0.28rem;
   text-decoration: none;
   color: var(--moss);
+}
+
+.site-header .wordmark {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.site-header.is-branded .wordmark {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
 }
 
 .wordmark-studio,
@@ -85,20 +169,85 @@
   color: var(--cream);
 }
 
+main {
+  position: relative;
+}
+
 .hero {
-  min-height: calc(100svh - 5.5rem);
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem var(--pad) 5rem;
+  padding: calc(var(--header-h) + var(--banner-h) + 2rem) var(--pad) 5rem;
 }
 
 .hero-logo {
   width: min(34rem, 88vw);
   height: auto;
   margin-bottom: 2.5rem;
+}
+
+/*
+ * Scroll reveals
+ * Each [data-reveal] block hides its direct children until it enters the
+ * viewport, then lets them rise into place one after another. Only active
+ * when <html> carries .do-anim (JS running, no reduced-motion preference).
+ */
+.do-anim [data-reveal] > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--dur-reveal) var(--ease),
+    transform var(--dur-reveal) var(--ease);
+  transition-delay: calc(var(--stagger) * var(--i, 0));
+}
+
+.do-anim [data-reveal] > :nth-child(2) { --i: 1; }
+.do-anim [data-reveal] > :nth-child(3) { --i: 2; }
+.do-anim [data-reveal] > :nth-child(4) { --i: 3; }
+.do-anim [data-reveal] > :nth-child(5) { --i: 4; }
+.do-anim [data-reveal] > :nth-child(6) { --i: 5; }
+
+.do-anim [data-reveal].is-visible > * {
+  opacity: 1;
+  transform: none;
+}
+
+/* The hero logo arrives slower and settles in from a slight enlargement. */
+.do-anim .hero > .hero-logo {
+  transform: scale(1.06);
+  transition-duration: var(--dur-reveal-slow);
+}
+
+.do-anim .hero.is-visible > .hero-logo {
+  transform: none;
+}
+
+/* Material photos come in as a slow settle rather than a rise. */
+.do-anim .materials > figure {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.do-anim .materials > figure img {
+  opacity: 0;
+  transform: scale(1.1);
+  transition:
+    opacity var(--dur-reveal) var(--ease),
+    transform var(--dur-reveal-slow) var(--ease),
+    scale var(--dur-slow) var(--ease);
+  transition-delay:
+    calc(var(--stagger) * var(--i, 0)),
+    calc(var(--stagger) * var(--i, 0)),
+    0s;
+}
+
+.do-anim .materials.is-visible > figure img {
+  opacity: 1;
+  transform: none;
 }
 
 .eyebrow {
@@ -148,6 +297,9 @@
   height: 100%;
   min-height: 18rem;
   object-fit: cover;
+  /* `scale` is separate from `transform`, so hover never fights the reveal. */
+  scale: 1;
+  transition: scale var(--dur-slow) var(--ease);
 }
 
 .materials figcaption {
@@ -159,6 +311,17 @@
   text-transform: uppercase;
   color: var(--cream);
   text-shadow: 0 1px 8px rgb(0 0 0 / 0.35);
+  transition: translate var(--dur) var(--ease);
+}
+
+@media (hover: hover) {
+  .materials figure:hover img {
+    scale: 1.04;
+  }
+
+  .materials figure:hover figcaption {
+    translate: 0 -0.25rem;
+  }
 }
 
 .split,
@@ -217,6 +380,281 @@
   color: var(--muted);
 }
 
+/*
+ * Portfolio
+ * A full-bleed horizontal track. The first item lines up with the text
+ * measure of the sections above; the rest run off the right edge to invite
+ * sideways scrolling. Alternate items sit a little lower for an editorial
+ * rhythm. Progress hairline and edge-settle are scroll-driven where the
+ * browser supports it, with a JS-driven fallback for the hairline.
+ */
+.portfolio {
+  --edge: max(var(--pad), calc((100vw - var(--measure)) / 2));
+  --item-h: clamp(18rem, 52vh, 30rem);
+  --offset: 2.5rem;
+  padding: 5.5rem 0 4.5rem;
+  border-top: 1px solid var(--line);
+  timeline-scope: --portfolio;
+  overflow: hidden;
+}
+
+.portfolio-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0 var(--edge);
+  margin-bottom: 3rem;
+}
+
+.portfolio h2 {
+  font-size: clamp(1.85rem, 5vw, 3.4rem);
+  line-height: 1.15;
+  letter-spacing: 0.14em;
+  text-transform: none;
+  font-style: italic;
+  font-weight: 300;
+  max-width: 18ch;
+}
+
+.portfolio-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+  padding-bottom: 0.4rem;
+}
+
+.portfolio-counter {
+  font-size: 0.72rem;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  margin-right: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-counter span {
+  color: var(--moss);
+}
+
+.portfolio-arrow {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--moss);
+  cursor: pointer;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    opacity var(--dur-fast) var(--ease);
+}
+
+.portfolio-arrow svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.portfolio-arrow:hover:not(:disabled),
+.portfolio-arrow:focus-visible {
+  border-color: var(--moss);
+  background: var(--moss);
+  color: var(--cream);
+  outline: none;
+}
+
+.portfolio-arrow:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.portfolio-track {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  padding: 0 var(--edge) var(--offset);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--edge);
+  scroll-behavior: smooth;
+  scroll-timeline: --portfolio inline;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.portfolio-track::-webkit-scrollbar {
+  display: none;
+}
+
+.portfolio-track.is-dragging {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  cursor: grabbing;
+}
+
+.portfolio-track:focus-visible {
+  outline: 1px solid var(--moss);
+  outline-offset: -1px;
+}
+
+.portfolio-item {
+  flex: 0 0 auto;
+  margin: 0;
+  scroll-snap-align: start;
+}
+
+.portfolio-item:nth-child(even) {
+  margin-top: var(--offset);
+}
+
+.portfolio-media {
+  height: var(--item-h);
+  overflow: hidden;
+  background: var(--moss-light);
+}
+
+.portfolio-item--landscape .portfolio-media {
+  aspect-ratio: 4 / 3;
+}
+
+.portfolio-item--portrait .portfolio-media {
+  aspect-ratio: 3 / 4;
+}
+
+.portfolio-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scale: 1;
+  transition: scale var(--dur-slow) var(--ease);
+}
+
+@media (hover: hover) {
+  .portfolio-item:hover .portfolio-media img {
+    scale: 1.03;
+  }
+}
+
+.portfolio-item figcaption {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.9rem;
+  align-items: baseline;
+  margin-top: 1rem;
+}
+
+.portfolio-num {
+  grid-row: 1 / span 2;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--bark);
+  font-variant-numeric: tabular-nums;
+}
+
+.portfolio-name {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+  color: var(--moss);
+}
+
+.portfolio-room {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.portfolio-progress {
+  position: relative;
+  height: 1px;
+  margin: 1.5rem var(--edge) 0;
+  background: var(--line);
+}
+
+.portfolio-progress::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--moss);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--progress, 0));
+  transition: transform 0.15s linear;
+}
+
+.portfolio-hint {
+  margin: 1.1rem var(--edge) 0;
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--bark);
+}
+
+/* Scroll-driven enhancements: run off the main thread where supported. */
+@supports (animation-timeline: scroll()) {
+  .portfolio-progress::before {
+    transition: none;
+    animation: portfolio-progress linear both;
+    animation-timeline: --portfolio;
+  }
+
+  @keyframes portfolio-progress {
+    from {
+      transform: scaleX(var(--start, 0.2));
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .do-anim .portfolio-media {
+    animation: portfolio-settle linear both;
+    animation-timeline: view(inline);
+    animation-range: cover 0% cover 35%;
+  }
+
+  @keyframes portfolio-settle {
+    from {
+      scale: 0.94;
+      opacity: 0.45;
+    }
+    to {
+      scale: 1;
+      opacity: 1;
+    }
+  }
+}
+
+/* Entrance: the whole section rises, then the cards slide in from the right. */
+.do-anim .portfolio .portfolio-item {
+  opacity: 0;
+  transform: translateX(3rem);
+  transition:
+    opacity var(--dur-reveal) var(--ease),
+    transform var(--dur-reveal) var(--ease);
+  transition-delay: calc(var(--stagger) * var(--i, 0) + 150ms);
+}
+
+.do-anim .portfolio.is-visible .portfolio-item {
+  opacity: 1;
+  transform: none;
+}
+
 .manifesto {
   background: var(--moss);
   color: var(--cream);
@@ -255,6 +693,176 @@
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--moss);
+}
+
+/*
+ * About Lisa
+ * Portrait on the left, voice on the right. The portrait drifts a few
+ * percent as you scroll past (scroll-driven, where supported), and the text
+ * lines arrive one after another.
+ */
+.about {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 3rem clamp(3rem, 7vw, 6rem);
+  align-items: center;
+  max-width: calc(var(--measure) + var(--pad) * 2);
+  margin: 0 auto;
+  padding: 5.5rem var(--pad);
+  border-top: 1px solid var(--line);
+}
+
+.about-portrait {
+  margin: 0;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--moss-light);
+}
+
+.about-portrait img {
+  width: 100%;
+  height: 110%;
+  object-fit: cover;
+  object-position: 50% 0;
+  translate: 0 0;
+}
+
+.about h2 {
+  font-size: clamp(1.85rem, 5vw, 3.4rem);
+  line-height: 1.15;
+  letter-spacing: 0.14em;
+  text-transform: none;
+  font-style: italic;
+  font-weight: 300;
+  margin-bottom: 1.75rem;
+}
+
+.about-quote {
+  margin: 2.25rem 0 0;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--line);
+  max-width: 30rem;
+}
+
+.about-quote p {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: 1.45rem;
+  line-height: 1.45;
+  letter-spacing: 0.04em;
+  color: var(--moss);
+}
+
+.about-meta {
+  margin-top: 2.25rem;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+  color: var(--moss);
+}
+
+.about-meta span {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--bark);
+}
+
+.about-link {
+  position: relative;
+  display: inline-block;
+  margin-top: 1.75rem;
+  padding-block: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--moss);
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.about-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform-origin: 0 50%;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.about-link:hover,
+.about-link:focus-visible {
+  color: var(--clay);
+  outline: none;
+}
+
+.about-link:hover::after,
+.about-link:focus-visible::after {
+  transform: scaleX(0);
+  transform-origin: 100% 50%;
+}
+
+@supports (animation-timeline: scroll()) {
+  .do-anim .about-portrait img {
+    animation: about-drift linear both;
+    animation-timeline: view();
+    animation-range: entry 0% exit 100%;
+  }
+
+  /* Fully framed as the section arrives; drifts up only as it leaves. */
+  @keyframes about-drift {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 -9%;
+    }
+  }
+}
+
+/* Entrance: the portrait settles from a slight enlargement; text lines stagger. */
+.do-anim .about > .about-portrait {
+  transform: scale(1.03);
+  transition-duration: var(--dur-reveal-slow);
+}
+
+.do-anim .about.is-visible > .about-portrait {
+  transform: none;
+}
+
+/* The body column itself stays put; only its lines move. */
+.do-anim .about > .about-body {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.do-anim .about .about-body > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-reveal) var(--ease),
+    transform var(--dur-reveal) var(--ease);
+  transition-delay: calc(var(--stagger) * var(--i, 0) + 120ms);
+}
+
+.do-anim .about .about-body > :nth-child(2) { --i: 1; }
+.do-anim .about .about-body > :nth-child(3) { --i: 2; }
+.do-anim .about .about-body > :nth-child(4) { --i: 3; }
+.do-anim .about .about-body > :nth-child(5) { --i: 4; }
+.do-anim .about .about-body > :nth-child(6) { --i: 5; }
+
+.do-anim .about.is-visible .about-body > * {
+  opacity: 1;
+  transform: none;
 }
 
 .contact {
@@ -308,6 +916,7 @@
   letter-spacing: 0.02em;
   text-transform: none;
   resize: vertical;
+  transition: border-color var(--dur-fast) var(--ease);
 }
 
 .inquiry input:focus,
@@ -327,11 +936,17 @@
   text-transform: uppercase;
   font-size: 0.72rem;
   cursor: pointer;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    letter-spacing var(--dur-fast) var(--ease);
 }
 
-.inquiry button:hover:not(:disabled) {
+.inquiry button:hover:not(:disabled),
+.inquiry button:focus-visible {
   background: var(--stone);
   border-color: var(--stone);
+  letter-spacing: 0.22em;
 }
 
 .inquiry button:disabled {
@@ -413,22 +1028,83 @@
     gap: 1.75rem;
   }
 
+  .about {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .about-portrait {
+    max-width: 26rem;
+  }
+
   .hero {
     min-height: auto;
-    padding-top: 3rem;
+    padding-top: calc(var(--header-h) + var(--banner-h) + 2.5rem);
+  }
+
+  .portfolio {
+    --item-h: clamp(15rem, 44vh, 22rem);
+    --offset: 1.5rem;
+  }
+
+  .portfolio-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.25rem;
   }
 }
 
 @media (max-width: 560px) {
+  :root {
+    --header-h: 3.6rem;
+  }
+
   .site-header {
-    flex-direction: column;
-    align-items: center;
-    padding-block: 1rem;
+    gap: 0.75rem;
+    padding-block: 0.9rem;
+  }
+
+  .site-header.is-scrolled {
+    padding-block: 0.7rem;
+  }
+
+  .site-header nav {
+    gap: 0.7rem;
+  }
+
+  .site-header nav a {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+  }
+
+  .site-header .wordmark {
+    gap: 0.2rem;
+  }
+
+  .site-header .wordmark-studio {
+    font-size: 0.46rem;
+  }
+
+  .site-header .wordmark-name {
+    font-size: 0.7rem;
   }
 
   .materials img {
     min-height: 8.5rem;
     max-height: 10rem;
+  }
+
+  .portfolio {
+    /* Landscape cards take ~90% of the width so the next card peeks in. */
+    --item-h: min(14rem, calc((100vw - 2 * var(--edge)) * 0.75 * 0.9));
+    --offset: 1rem;
+    padding-top: 4rem;
+  }
+
+  .portfolio-arrow {
+    width: 2.4rem;
+    height: 2.4rem;
   }
 
   .materials figcaption {

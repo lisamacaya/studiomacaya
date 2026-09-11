@@ -18,6 +18,19 @@
   --pad: clamp(1.5rem, 5vw, 4.5rem);
   --measure: 68rem;
 
+  /* Motion. Shared easing and durations so every transition feels related. */
+  --ease: cubic-bezier(0.33, 0, 0, 1);
+  --dur-fast: 0.3s;
+  --dur: 0.5s;
+  --dur-slow: 1.2s;
+  /* Scroll reveals run on their own, slower clock than UI transitions. */
+  --dur-reveal: 0.9s;
+  --dur-reveal-slow: 1.8s;
+  --stagger: 110ms;
+
+  --header-h: 4.5rem;
+  --banner-h: 0px;
+
   font: 18px/1.65 var(--sans);
   color: var(--text);
   background: var(--bg);
@@ -36,6 +49,13 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-h) + var(--banner-h) + 1rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 body {

@@ -1,0 +1,672 @@
+/*
+ * Hero explorations (?hero=N). Everything animated lives under `.do-anim`,
+ * so reduced-motion visitors get the static composition. Timings hang off
+ * `--t0`, the moment the copy starts arriving.
+ */
+
+/* Scroll progress (0 → 1) for the scroll-driven options. Registered so it can
+   be animated by a scroll timeline; on other browsers a small hook sets it. */
+@property --p {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+/* Opening progress (0 → 1) for the arch's first appearance. */
+@property --open {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+.ho {
+  --t0: 0.4s;
+  position: relative;
+}
+
+/* Shared pieces ----------------------------------------------------------- */
+
+.ho-logo-wrap {
+  width: min(34rem, 88vw);
+  margin-bottom: 2.5rem;
+}
+
+.ho-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.ho-logo--moss {
+  fill: var(--moss);
+}
+
+.ho-logo--cream {
+  fill: var(--cream);
+}
+
+.ho-headline {
+  margin: 0;
+}
+
+.ho-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding: 0 0.08em 0.28em;
+  margin: 0 -0.08em -0.28em;
+}
+
+.ho-word + .ho-word {
+  margin-left: 0.1em;
+}
+
+.ho-word > span {
+  display: inline-block;
+}
+
+.ho-cue {
+  position: absolute;
+  left: 50%;
+  bottom: 2rem;
+  translate: -50% 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  text-decoration: none;
+  font-size: 0.6rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--bark);
+}
+
+.ho-cue--cream {
+  color: color-mix(in srgb, var(--cream) 75%, transparent);
+}
+
+.ho-cue i {
+  display: block;
+  width: 1px;
+  height: 3rem;
+  background: currentColor;
+  opacity: 0.5;
+  position: relative;
+  overflow: hidden;
+}
+
+.ho-cue i::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  transform: translateY(-100%);
+}
+
+.do-anim .ho-cue i {
+  background: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+.do-anim .ho-cue i::after {
+  animation: ho-cue 2.4s var(--ease) 1s infinite;
+}
+
+@keyframes ho-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  55% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Entrances --------------------------------------------------------------- */
+
+@keyframes ho-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ho-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ho-word {
+  from {
+    transform: translateY(120%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ho-settle {
+  from {
+    scale: 1.14;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+.do-anim .ho-eyebrow {
+  animation: ho-rise var(--dur-reveal) var(--ease) var(--t0) both;
+}
+
+.do-anim .ho-word > span {
+  animation: ho-word 1.1s var(--ease) calc(var(--t0) + 0.25s + var(--i) * 0.14s) both;
+}
+
+.do-anim .ho-lede {
+  animation: ho-rise var(--dur-reveal) var(--ease) calc(var(--t0) + 1s) both;
+}
+
+.do-anim .ho-cue {
+  animation: ho-fade var(--dur-reveal) var(--ease) calc(var(--t0) + 1.6s) both;
+}
+
+.do-anim .ho-logo {
+  animation: ho-fade var(--dur-reveal-slow) var(--ease) both;
+}
+
+/* Switcher ---------------------------------------------------------------- */
+
+.ho-switcher {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cream) 88%, transparent);
+  backdrop-filter: blur(10px);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--bark);
+}
+
+.ho-switcher a {
+  display: grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  text-decoration: none;
+  color: var(--moss);
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  letter-spacing: 0;
+  transition:
+    background-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.ho-switcher a:hover {
+  background: color-mix(in srgb, var(--moss) 12%, transparent);
+}
+
+.ho-switcher a[aria-current='true'] {
+  background: var(--moss);
+  color: var(--cream);
+}
+
+/* Cream header over a photographic hero, until the page scrolls. */
+.ho-theme-dark .site-header:not(.is-scrolled) nav a {
+  color: var(--cream);
+}
+
+.ho-theme-dark .site-header:not(.is-scrolled) nav a:hover,
+.ho-theme-dark .site-header:not(.is-scrolled) nav a:focus-visible {
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+}
+
+/* ======================================================================== */
+/* 1 · Room                                                                  */
+
+.ho-room {
+  --t0: 1.1s;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  align-items: end;
+  justify-items: start;
+  justify-content: stretch;
+  padding: calc(var(--header-h) + var(--banner-h) + 2rem) var(--pad) 4.5rem;
+  text-align: left;
+  color: var(--cream);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ho-room-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--moss);
+}
+
+.ho-room-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 45%;
+}
+
+.ho-room-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgb(20 24 10 / 0.35), transparent 28%),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--moss) 88%, black) 0%,
+      color-mix(in srgb, var(--moss) 45%, transparent) 30%,
+      transparent 64%
+    );
+}
+
+.ho-room-logo {
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  width: min(26rem, 72vw);
+  filter: drop-shadow(0 6px 30px rgb(0 0 0 / 0.25));
+}
+
+.ho-room-copy {
+  grid-row: 2;
+  max-width: 34rem;
+}
+
+.ho-room .eyebrow {
+  color: color-mix(in srgb, var(--cream) 70%, transparent);
+}
+
+.ho-room h1 {
+  color: var(--cream);
+}
+
+.ho-room .lede {
+  color: color-mix(in srgb, var(--cream) 62%, transparent);
+}
+
+.ho-room-caption {
+  position: absolute;
+  right: var(--pad);
+  bottom: 4.5rem;
+  text-align: right;
+  font-family: var(--serif);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+}
+
+.ho-room-caption span {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 60%, transparent);
+}
+
+/* The copy owns the bottom-left, so the cue sits above the caption. */
+.ho-room .ho-cue {
+  left: auto;
+  right: var(--pad);
+  bottom: 10rem;
+  translate: 0 0;
+  align-items: flex-end;
+}
+
+.do-anim .ho-room-media {
+  animation: ho-fade 1.6s var(--ease) both;
+}
+
+.do-anim .ho-room-media img {
+  animation:
+    ho-settle 2.8s var(--ease) both,
+    ho-drift 30s ease-in-out 2.8s infinite alternate;
+}
+
+.do-anim .ho-room-caption {
+  animation: ho-rise var(--dur-reveal) var(--ease) calc(var(--t0) + 1.2s) both;
+}
+
+@keyframes ho-drift {
+  from {
+    translate: 0 0;
+    scale: 1;
+  }
+  to {
+    translate: -1.5% 1%;
+    scale: 1.06;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  /* Photograph lags behind the page as it scrolls away. */
+  .do-anim .ho-room-media {
+    animation:
+      ho-fade 1.6s var(--ease) both,
+      ho-parallax linear both;
+    animation-timeline: auto, scroll(root);
+    animation-range: normal, 0 100vh;
+  }
+
+  @keyframes ho-parallax {
+    to {
+      translate: 0 22%;
+    }
+  }
+}
+
+/* ======================================================================== */
+/* 2 · Threshold                                                             */
+
+.ho-threshold {
+  --t0: 1.7s;
+}
+
+.ho-threshold .ho-logo-wrap {
+  width: min(18rem, 66vw);
+  margin-bottom: 2.75rem;
+}
+
+.ho-arch {
+  margin: 0 0 2.75rem;
+  width: min(21rem, 74vw);
+  height: min(46vh, 29rem);
+  overflow: hidden;
+  clip-path: inset(0 0 0 0 round 999px 999px 0 0);
+  background: var(--moss-light);
+}
+
+.ho-arch img {
+  width: 100%;
+  height: 112%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  display: block;
+}
+
+.do-anim .ho-arch {
+  animation: ho-arch-open 2s var(--ease) 0.3s both;
+}
+
+.do-anim .ho-arch img {
+  animation:
+    ho-settle 3s var(--ease) 0.3s both,
+    ho-focus 2s var(--ease) 0.3s both;
+}
+
+@keyframes ho-arch-open {
+  from {
+    clip-path: inset(0 49.6% 0 49.6% round 999px 999px 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 999px 999px 0 0);
+  }
+}
+
+/* Soft while the arch is a sliver, sharp once it has opened. */
+@keyframes ho-focus {
+  from {
+    filter: blur(12px);
+  }
+  to {
+    filter: blur(0);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .do-anim .ho-arch img {
+    animation:
+      ho-settle 3s var(--ease) 0.3s both,
+      ho-focus 2s var(--ease) 0.3s both,
+      ho-arch-drift linear both;
+    animation-timeline: auto, auto, view();
+    animation-range: normal, normal, entry 0% exit 100%;
+  }
+
+  @keyframes ho-arch-drift {
+    from {
+      translate: 0 0;
+    }
+    to {
+      translate: 0 -10.7%;
+    }
+  }
+}
+
+/* ======================================================================== */
+/* 3 · Threshold, widening                                                   */
+/*
+ * The photograph sits in a box on a sticky stage. At rest the box is the
+ * arch, fitted exactly like option 2's; as the page scrolls (`--p`) the box
+ * grows until it fills the viewport and its arched top squares off. The load
+ * opening (`--open`) is a clip on that box, from a sliver to the full arch.
+ */
+
+.ho-portal {
+  --t0: 1.7s;
+  --p: 0;
+  --open: 1;
+  /* Starting insets of the arch inside the stage, measured from the
+     placeholder by the component (px). Until then, nothing shows. */
+  --top0: 0px;
+  --bottom0: 0px;
+  --side0: 50cqw;
+  display: block;
+  min-height: 100svh;
+  padding: 0;
+}
+
+/* Extra height is the scroll distance over which the arch widens. */
+.do-anim .ho-portal {
+  height: 200svh;
+}
+
+.ho-portal-sentinel {
+  position: absolute;
+  top: 45svh;
+  left: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.ho-portal-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  /* Lets the clip below measure the stage in cq units (plain lengths). */
+  container-type: size;
+  overflow: hidden;
+  /* Same composition as option 2. */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: calc(var(--header-h) + var(--banner-h) + 2rem) var(--pad) 5rem;
+}
+
+/* Where the arch sits at rest; the photograph is clipped to this box. */
+.ho-portal-window {
+  width: min(21rem, 74vw);
+  height: min(46vh, 29rem);
+  margin-bottom: 2.75rem;
+}
+
+/* The photograph's box is the arch itself at rest (so it is fitted exactly
+   like option 2's) and grows into the whole stage as `--p` rises. */
+.ho-portal-figure {
+  position: absolute;
+  top: calc(var(--top0) * (1 - var(--p)));
+  right: calc(var(--side0) * (1 - var(--p)));
+  bottom: calc(var(--bottom0) * (1 - var(--p)));
+  left: calc(var(--side0) * (1 - var(--p)));
+  margin: 0;
+  overflow: hidden;
+  background: var(--moss-light);
+  /* Arched top that squares off as the box fills the viewport. */
+  --r: calc(999px * (1 - var(--p)));
+  /* While opening, the sides start as a sliver at the centre line. */
+  --gap: calc(49.6% * (1 - var(--open)));
+  clip-path: inset(0 var(--gap) 0 var(--gap) round var(--r) var(--r) 0 0);
+}
+
+.ho-portal-figure img {
+  /* Same fit as option 2's arch. */
+  width: 100%;
+  height: 112%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  display: block;
+  /* Settles and comes into focus as the arch opens. */
+  scale: calc(1 + 0.14 * (1 - var(--open)));
+  filter: blur(calc(12px * (1 - var(--open))));
+}
+
+/* Legibility scrim, only once the photograph is behind the type. */
+.ho-portal-figure::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: var(--p);
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--moss) 85%, black) 0%,
+    color-mix(in srgb, var(--moss) 40%, transparent) 38%,
+    transparent 70%
+  );
+}
+
+.ho-portal-logo {
+  position: relative;
+  z-index: 1;
+  width: min(18rem, 66vw);
+  margin-bottom: 2.75rem;
+  /* Gone before the widening arch reaches it. */
+  opacity: clamp(0, 1 - var(--p) * 5, 1);
+}
+
+.ho-portal-copy {
+  position: relative;
+  z-index: 1;
+  /* Moss on cream at first, cream on the photograph by the time the
+     photograph reaches the type (it arrives at the headline around p≈0.15). */
+  --ink: clamp(0%, (var(--p) - 0.1) * 200%, 100%);
+}
+
+.ho-portal-copy .eyebrow {
+  color: color-mix(in srgb, var(--cream) var(--ink), var(--bark));
+}
+
+.ho-portal-copy h1 {
+  color: color-mix(in srgb, var(--cream) var(--ink), var(--moss));
+}
+
+.ho-portal-copy .lede {
+  color: color-mix(in srgb, var(--cream) var(--ink), var(--muted));
+}
+
+.do-anim .ho-portal-figure {
+  animation: ho-open 2s var(--ease) 0.3s both;
+}
+
+@keyframes ho-open {
+  from {
+    --open: 0;
+  }
+  to {
+    --open: 1;
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .do-anim .ho-portal {
+    animation: ho-progress linear both;
+    animation-timeline: scroll(root);
+    /* Keep in step with PORTAL_DISTANCE_VH in HeroOptions.tsx. */
+    animation-range: 0 90vh;
+  }
+}
+
+@keyframes ho-progress {
+  from {
+    --p: 0;
+  }
+  to {
+    --p: 1;
+  }
+}
+
+/* ======================================================================== */
+/* Small screens                                                             */
+
+@media (max-width: 900px) {
+  .ho-room,
+  .ho-threshold,
+  .ho-portal {
+    min-height: 100svh;
+  }
+
+  .ho-room-caption {
+    display: none;
+  }
+
+  .ho-threshold .ho-logo-wrap {
+    width: min(15rem, 62vw);
+  }
+
+  .ho-portal-logo {
+    width: min(15rem, 62vw);
+  }
+
+  .ho-arch,
+  .ho-portal-window {
+    height: min(40vh, 24rem);
+  }
+}
+
+@media (max-width: 560px) {
+  .ho-switcher {
+    left: 0.75rem;
+    bottom: 0.75rem;
+  }
+
+  .ho-room {
+    padding-bottom: 5.5rem;
+  }
+
+  .ho-room-logo {
+    width: min(18rem, 70vw);
+  }
+
+  .ho-room .ho-cue {
+    display: none;
+  }
+}
