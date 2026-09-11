@@ -7,13 +7,16 @@ import {
   type PointerEvent,
 } from 'react'
 import { isDev, isLive } from './env'
-import { getHeroVariant, heroTheme } from './hero-options/variants'
+import { projects, pad2 } from './projects'
+import { getHeroVariant, heroGallery, heroTheme } from './hero-options/variants'
 import './App.css'
 /* After App.css on purpose: the option styles override the base hero. */
 import { HeroOption, HeroSwitcher } from './hero-options/HeroOptions'
+import { ArchGallery } from './hero-options/ArchGallery'
 
-/* Hero explorations, shown only with `?hero=1` … `?hero=5` in the URL. */
+/* Hero explorations, chosen with `?hero=N` in the URL (see hero-options/). */
 const heroVariant = getHeroVariant()
+const galleryVariant = heroVariant ? heroGallery(heroVariant) : null
 
 const navItems = [
   { id: 'approach', label: 'Approach' },
@@ -160,54 +163,6 @@ const materials = [
   { src: '/textures/bark.jpg', alt: 'Peeling bark in cream and taupe', label: 'Bark' },
   { src: '/textures/moss.jpg', alt: 'Moss growing on a tree trunk', label: 'Moss' },
 ] as const
-
-/* Placeholder projects until real photography is available. */
-const projects = [
-  {
-    src: '/portfolio/living-room.jpg',
-    alt: 'Living room with a linen sofa, travertine table, and a moss velvet armchair',
-    name: 'Casa Almendra',
-    room: 'Living room',
-    orientation: 'landscape',
-  },
-  {
-    src: '/portfolio/kitchen.jpg',
-    alt: 'Kitchen with moss green cabinetry, terracotta floor, and an arched window',
-    name: 'Apartamento Roble',
-    room: 'Kitchen',
-    orientation: 'portrait',
-  },
-  {
-    src: '/portfolio/bedroom.jpg',
-    alt: 'Bedroom with a low oak bed, sage linen, and lime-washed green walls',
-    name: 'Villa Musgo',
-    room: 'Bedroom',
-    orientation: 'landscape',
-  },
-  {
-    src: '/portfolio/reading-corner.jpg',
-    alt: 'Reading corner with a boucle armchair, olive tree, and herringbone oak floor',
-    name: 'Estudio Norte',
-    room: 'Reading corner',
-    orientation: 'portrait',
-  },
-  {
-    src: '/portfolio/bathroom.jpg',
-    alt: 'Bathroom in warm plaster with a freestanding travertine bath',
-    name: 'Casa Piedra',
-    room: 'Bathroom',
-    orientation: 'landscape',
-  },
-  {
-    src: '/portfolio/dining.jpg',
-    alt: 'Dining room with clay plaster walls, an oak table, and mismatched wooden chairs',
-    name: 'Loft Arcilla',
-    room: 'Dining',
-    orientation: 'portrait',
-  },
-] as const
-
-const pad2 = (n: number) => String(n).padStart(2, '0')
 
 /**
  * Horizontal project gallery. Native scrolling with snap points, so touch,
@@ -581,7 +536,7 @@ function App() {
           </article>
         </section>
 
-        <Portfolio />
+        {galleryVariant === 'arch' ? <ArchGallery /> : <Portfolio />}
 
         <section className="manifesto" aria-labelledby="manifesto-title" data-reveal>
           <p className="eyebrow">Brand manifesto</p>

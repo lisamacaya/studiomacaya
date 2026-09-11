@@ -640,18 +640,28 @@ main {
   }
 }
 
-/* Entrance: the whole section rises, then the cards slide in from the right. */
+/* Entrance: the whole section rises, then the cards slide in from the right.
+   The slide is applied to the card's contents, never to .portfolio-item itself:
+   the items are the scroll-snap targets, and a transform on them shifts the
+   snap positions, which makes the track snap sideways and then re-snap as the
+   transform settles (a visible jump). */
 .do-anim .portfolio .portfolio-item {
   opacity: 0;
+  transition: opacity var(--dur-reveal) var(--ease);
+  transition-delay: calc(var(--stagger) * var(--i, 0) + 150ms);
+}
+
+.do-anim .portfolio .portfolio-item > * {
   transform: translateX(3rem);
-  transition:
-    opacity var(--dur-reveal) var(--ease),
-    transform var(--dur-reveal) var(--ease);
+  transition: transform var(--dur-reveal) var(--ease);
   transition-delay: calc(var(--stagger) * var(--i, 0) + 150ms);
 }
 
 .do-anim .portfolio.is-visible .portfolio-item {
   opacity: 1;
+}
+
+.do-anim .portfolio.is-visible .portfolio-item > * {
   transform: none;
 }
 

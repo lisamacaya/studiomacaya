@@ -6,7 +6,7 @@
  */
 import { useEffect, useLayoutEffect, useRef, type CSSProperties, type RefObject } from 'react'
 import { LOGO_MACAYA, LOGO_RULE, LOGO_STUDIO, LOGO_VIEWBOX } from './logo-paths'
-import { heroOptions, type HeroVariant } from './variants'
+import { heroKind, heroOptions, type HeroVariant } from './variants'
 import './hero-options.css'
 
 type LogoRef = RefObject<HTMLElement | null>
@@ -17,12 +17,12 @@ interface Props {
 }
 
 export function HeroOption({ variant, logoRef }: Props) {
-  switch (variant) {
-    case 1:
+  switch (heroKind(variant)) {
+    case 'room':
       return <Room logoRef={logoRef} />
-    case 2:
+    case 'threshold':
       return <Threshold logoRef={logoRef} />
-    case 3:
+    case 'portal':
       return <Portal logoRef={logoRef} />
   }
 }

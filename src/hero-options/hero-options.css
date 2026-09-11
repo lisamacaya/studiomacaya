@@ -625,6 +625,147 @@
 }
 
 /* ======================================================================== */
+/* 4 · Arch gallery                                                          */
+/*
+ * Selected Work as a single doorway. The current room sits in a large arch,
+ * the hero's shape; choosing another room opens it the way the hero opens,
+ * from a sliver at the centre line, soft then sharp, over the previous one.
+ */
+
+.ag-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 var(--edge);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  outline: none;
+}
+
+.ag-stage:focus-visible .ag-arch {
+  outline: 1px solid var(--moss);
+  outline-offset: 8px;
+}
+
+.ag-arch {
+  position: relative;
+  width: min(36rem, 90vw);
+  height: min(62vh, 36rem);
+  margin: 0;
+  overflow: hidden;
+  border-radius: 999px 999px 0 0;
+  background: var(--moss-light);
+}
+
+.ag-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  display: block;
+}
+
+/* The incoming room opens like the hero; the outgoing one recedes beneath. */
+.do-anim .ag.is-visible .ag-frame--in {
+  animation: ag-open 1.6s var(--ease) both;
+}
+
+.do-anim .ag.is-visible .ag-frame--out {
+  animation: ag-recede 1.6s var(--ease) both;
+}
+
+@keyframes ag-open {
+  from {
+    clip-path: inset(0 49.6% 0 49.6% round 999px 999px 0 0);
+    filter: blur(12px);
+    scale: 1.14;
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 999px 999px 0 0);
+    filter: blur(0);
+    scale: 1;
+  }
+}
+
+@keyframes ag-recede {
+  to {
+    scale: 1.08;
+    filter: brightness(0.75);
+  }
+}
+
+.ag-caption {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 0.9rem;
+  align-items: baseline;
+  justify-content: center;
+  margin-top: 1.25rem;
+  min-height: 2.6rem;
+  cursor: default;
+}
+
+.ag-caption .portfolio-num {
+  grid-row: 1 / span 2;
+}
+
+.do-anim .ag.is-visible .ag-caption {
+  animation: ho-rise 0.9s var(--ease) 0.35s both;
+}
+
+.ag-thumbs {
+  display: flex;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 2.25rem;
+  padding: 0 var(--edge);
+}
+
+.ag-thumb {
+  width: 2.6rem;
+  padding: 0 0 0.6rem;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  opacity: 0.4;
+  transition:
+    opacity var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.ag-thumb img {
+  width: 100%;
+  height: 3.4rem;
+  object-fit: cover;
+  display: block;
+  border-radius: 999px 999px 0 0;
+  background: var(--moss-light);
+}
+
+.ag-thumb:hover {
+  opacity: 0.75;
+}
+
+.ag-thumb[aria-selected='true'] {
+  opacity: 1;
+  border-bottom-color: var(--moss);
+}
+
+.ag-thumb:focus-visible {
+  outline: 1px solid var(--moss);
+  outline-offset: 4px;
+}
+
+.ag .portfolio-hint {
+  text-align: center;
+}
+
+/* ======================================================================== */
 /* Small screens                                                             */
 
 @media (max-width: 900px) {
@@ -632,6 +773,23 @@
   .ho-threshold,
   .ho-portal {
     min-height: 100svh;
+  }
+
+  .ag-arch {
+    width: min(36rem, 86vw);
+    height: min(54vh, 28rem);
+  }
+
+  .ag-thumbs {
+    gap: 0.6rem;
+  }
+
+  .ag-thumb {
+    width: 2.2rem;
+  }
+
+  .ag-thumb img {
+    height: 2.9rem;
   }
 
   .ho-room-caption {

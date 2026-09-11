@@ -1,12 +1,21 @@
 import { isLive } from '../env'
 
+/*
+ * `hero` picks the opening; `gallery` optionally swaps the Selected Work
+ * section for an alternative treatment.
+ */
 export const heroOptions = [
-  { id: 1, name: 'Room', theme: 'dark' },
-  { id: 2, name: 'Threshold', theme: 'light' },
-  { id: 3, name: 'Threshold, widening', theme: 'light' },
+  { id: 1, name: 'Room', hero: 'room', theme: 'dark', gallery: null },
+  { id: 2, name: 'Threshold', hero: 'threshold', theme: 'light', gallery: null },
+  { id: 3, name: 'Threshold, widening', hero: 'portal', theme: 'light', gallery: null },
+  { id: 4, name: 'Threshold, widening + arch gallery', hero: 'portal', theme: 'light', gallery: 'arch' },
 ] as const
 
 export type HeroVariant = (typeof heroOptions)[number]['id']
+export type HeroKind = (typeof heroOptions)[number]['hero']
+export type GalleryKind = (typeof heroOptions)[number]['gallery']
+
+const option = (variant: HeroVariant) => heroOptions.find((o) => o.id === variant)
 
 /* Reads `?hero=N`. Never active on the live site, whatever the URL says. */
 export function getHeroVariant(): HeroVariant | null {
@@ -17,5 +26,13 @@ export function getHeroVariant(): HeroVariant | null {
 }
 
 export function heroTheme(variant: HeroVariant) {
-  return heroOptions.find((o) => o.id === variant)?.theme ?? 'light'
+  return option(variant)?.theme ?? 'light'
+}
+
+export function heroKind(variant: HeroVariant): HeroKind {
+  return option(variant)?.hero ?? 'threshold'
+}
+
+export function heroGallery(variant: HeroVariant): GalleryKind {
+  return option(variant)?.gallery ?? null
 }
