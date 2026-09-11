@@ -1,5 +1,3 @@
-import { isLive } from '../env'
-
 /*
  * `hero` picks the opening; `gallery` optionally swaps the Selected Work
  * section for an alternative treatment.
@@ -17,9 +15,8 @@ export type GalleryKind = (typeof heroOptions)[number]['gallery']
 
 const option = (variant: HeroVariant) => heroOptions.find((o) => o.id === variant)
 
-/* Reads `?hero=N`. Never active on the live site, whatever the URL says. */
+/* Reads `?hero=N`; anything else means the current hero. */
 export function getHeroVariant(): HeroVariant | null {
-  if (isLive) return null
   const raw = new URLSearchParams(window.location.search).get('hero')
   const n = Number(raw)
   return heroOptions.some((o) => o.id === n) ? (n as HeroVariant) : null

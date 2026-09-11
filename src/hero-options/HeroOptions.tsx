@@ -1,8 +1,8 @@
 /*
  * Hero explorations. Alternative openings for the landing page, chosen with
- * `?hero=N` in the URL. The switcher is shown on local and dev builds only,
- * and the options never activate on the live site (see variants.ts), so the
- * current hero stays exactly as it is until one is promoted.
+ * `?hero=N` in the URL. Without the parameter the current hero renders
+ * unchanged; the floating switcher lets the options be flipped through in
+ * place while they are under review.
  */
 import { useEffect, useLayoutEffect, useRef, type CSSProperties, type RefObject } from 'react'
 import { LOGO_MACAYA, LOGO_RULE, LOGO_STUDIO, LOGO_VIEWBOX } from './logo-paths'

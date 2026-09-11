@@ -6,7 +6,7 @@ import {
   type FormEvent,
   type PointerEvent,
 } from 'react'
-import { isDev, isLive } from './env'
+import { isDev } from './env'
 import { projects, pad2 } from './projects'
 import { getHeroVariant, heroGallery, heroTheme } from './hero-options/variants'
 import './App.css'
@@ -652,8 +652,8 @@ function App() {
         <p className="footer-meta">© {new Date().getFullYear()} Studio Macaya</p>
       </footer>
 
-      {/* Hero option switcher: local and dev builds only, never on the live site. */}
-      {!isLive && <HeroSwitcher current={heroVariant} />}
+      {/* Hero option switcher, shown on every environment while the options are under review. */}
+      <HeroSwitcher current={heroVariant} />
     </div>
   )
 }
